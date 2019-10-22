@@ -77,7 +77,7 @@ Create a directory named `scr` and then create a file inside named `HelloWorld.j
 possible to reconfigure the default directory path (see "Config").
 
 ```javascript
-const Deus = require('deus').Deus;
+const Deus = require('deusjs').Deus;
 
 module.exports = class HelloWorld extends Deus.Cmp {
     title = 'My Hello World component';
@@ -105,7 +105,7 @@ Your app.js:
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function(){
-    const Deus = require('deus').Deus;
+    const Deus = require('deusjs').Deus;
 
     // Navigate to HelloWorld screen.
     Deus.go('HelloWorld');
@@ -169,7 +169,7 @@ directory will store components that will never be used as root level screens.
 Now create a file called `SampleText.js` with the following code:
 
 ```javascript    
-const Deus = require('deus').Deus; 
+const Deus = require('deusjs').Deus; 
 
 module.exports = class SampleText extends Deus.Cmp {
     html() {
