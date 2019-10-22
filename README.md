@@ -93,6 +93,9 @@ module.exports = class HelloWorld extends Cmp {
 Note the use of backticks around the HTML, this will allow executing JavaScript 
 code inside the HTML using `${expression}` placeholders.
 
+Tip: There are Visual Studio Code extensions that will syntax highlight the HTML here, 
+you can find them by searching for "es6-string" in the extensions marketplace.
+
 > Warning! only the first HTML element (and its children) will be used.
 > A convention you might adopt is to wrap groups of HTML elements in a `<div>`.
 
