@@ -1,0 +1,43 @@
+{
+  "name": "deusjs",
+  "version": "0.0.0",
+  "description": "A very lightweight front-end framework inspired by React but easier to learn",
+  "main": "deus.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/braksator/DeusJS.git"
+  },
+  "keywords": [
+    "react",
+    "virtual",
+    "dom",
+    "vdom",
+    "component",
+    "composition",
+    "components",
+    "navigation",
+    "event",
+    "events",
+    "global",
+    "state",
+    "state",
+    "autoload",
+    "autoloading",
+    "thin",
+    "lightweight",
+    "tiny",
+    "html"
+  ],
+  "author": "Daniel Braksator",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/braksator/DeusJS/issues"
+  },
+  "homepage": "https://github.com/braksator/DeusJS#readme",
+  "devDependencies": {
+    "decomment": "^0.9.2"
+  }
+}
