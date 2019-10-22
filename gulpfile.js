@@ -7,7 +7,7 @@ var rename = require("gulp-rename");
 gulp.task('deus', function () {
   return gulp.src('./src.js')
     .pipe(terser({
-        ecma: 6,
+        ecma: 7,
         mangle: {
           toplevel: true,
         },
