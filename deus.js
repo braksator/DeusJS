@@ -105,8 +105,8 @@ class C extends I {
 }
 
 class N extends I {
-	//c = {};
-	//s = [];
+	c = {};
+	s = [];
     go(s, p, c = D.body, f, k) {
         //if (!k) {
 			k = new (require(Cfg.sp + s))();
