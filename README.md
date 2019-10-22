@@ -24,19 +24,18 @@ If you know HTML and JavaScript, you can learn DeusJS very quickly.
 
 ## Usage
 
-Get your hands on [deus.min.js](https://raw.githubusercontent.com/braksator/DeusJS/master/deus.min.js) and `require()` the file.
+Get your hands on [deus.js](https://raw.githubusercontent.com/braksator/DeusJS/master/deus.js) and `require()` the file.
 
 Everywhere you use DeusJS you'll have to require DeusJS in your project:
 
 ```javascript
-const DeusJS = require('./path/to/deus.min.js'); 
-const {Cmp, Nav, Ev, State, Cfg} = DeusJS;
+const Deus = require('./path/to/deus.js').Deus;
 
 ```
 
 ### Usage with NPM
 
-DeusJS [is available on NPM](https://www.npmjs.com/package/deus) if you prefer: `npm install deus -S` or with Yarn (recommended): `yarn add deus`
+DeusJS [is available on NPM](https://www.npmjs.com/package/deusjs) if you prefer: `npm install deusjs -S` or with Yarn (recommended): `yarn add deusjs`
 
 
 ## Setting up a project
@@ -78,10 +77,9 @@ Create a directory named `scr` and then create a file inside named `HelloWorld.j
 possible to reconfigure the default directory path (see "Config").
 
 ```javascript
-const deus = require('deus'); 
-const {Cmp} = deus;
+const Deus = require('deus').Deus;
 
-module.exports = class HelloWorld extends Cmp {
+module.exports = class HelloWorld extends Deus.Cmp {
     title = 'My Hello World component';
     html() {
         return `
@@ -107,18 +105,19 @@ Your app.js:
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function(){
-    const deus = require('deus');
-    const {Nav} = deus;
-    Nav.go('HelloWorld');
+    const Deus = require('deus').Deus;
+
+    // Navigate to HelloWorld screen.
+    Deus.go('HelloWorld');
 });
 ```
 
 Since we're navigating to this component it will be the root component of the app,
 it is essentially the screen container, it has no parent.  It will automatically replace
 the `body` of your document unless the `container` argument is supplied in 
-`Nav.go()` which would be a HTMLElement selected from the DOM:
+`Deus.go()` which would be a HTMLElement selected from the DOM:
 
-> `Nav.go(screenName[, props, container])`
+> `Deus.go(screenName[, props, container])`
 
 You don't need to import or require the component, it will be autoloaded.
 
@@ -170,11 +169,9 @@ directory will store components that will never be used as root level screens.
 Now create a file called `SampleText.js` with the following code:
 
 ```javascript    
+const Deus = require('deus').Deus; 
 
-const deus = require('deus'); 
-const {Cmp} = deus;
-
-module.exports = class SampleText extends Cmp {
+module.exports = class SampleText extends Deus.Cmp {
     html() {
         return "Lorem Ipsum Dolor Sit Amet";
     }
@@ -184,14 +181,14 @@ module.exports = class SampleText extends Cmp {
 
 ### Updating components
 
-Rerendering can only be done by calling `this.setState({someKey: someVal})`.
+Rerendering can only be done through setting state by calling `this.set({someKey: someVal})`.
 If you want to rerender, then *something* changed, and you need to represent
 that change by tracking a state for something.  That being said, calling
-`this.setState({})` without changing the value of the state allows you to
+`this.set({})` without changing the value of the state allows you to
 trigger a rerender if there is some external factor (such as global state)
 that has caused the return value of html() to change.
 
-> `this.setState({key1: val1[, key2: val2, ...]})`
+> `this.set({key1: val1[, key2: val2, ...]})`
 
 ### Methods to implement
 
@@ -206,8 +203,8 @@ Here are all the member functions you can implement.
 
 Some other things you can access:
 
-- `this.props` The props passed in from a parent's `this.use()` or via `Nav.go()`.
-- `this.state` The state object resulting from your calls to `this.setState()`. 
+- `this.props` The props passed in from a parent's `this.use()` or via `Deus.go()`.
+- `this.state` The state object resulting from your calls to `this.set()`. 
 - `this.c` Array of children, each in the format of an object with keys `n` (name), `p` (props), and `c` (component).
 - `this.p` Parent component (will be undefined for the root component).
 - `this.l` The HTMLElement parsed from the component's HTML.
@@ -224,11 +221,11 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `Nav.go(screenName[, props, container, callback])`
+> `Deus.go(screenName[, props, container, callback])`
 
-> `Nav.back([numberOfSteps, ..?])`
+> `Deus.back([numberOfSteps, ..?])`
 
-The `callback` arg in `Nav.go()` is used to supply a custom way to attach 
+The `callback` arg in `Deus.go()` is used to supply a custom way to attach 
 the element to the DOM, e.g. to facilitate a transition.  To emulate the 
 default behaviour:
 
@@ -246,19 +243,19 @@ the URL will be appended with the component's name.
 
 ## Events / Triggers / Messaging 
 
-Components can communicate and pass data via the event emitter `Ev`.
+Components can communicate and pass data via the event emitter and listeners.
 
 ### Listening for an event
 
-Components typically use `Ev.on()` in their `load()` function, and `Ev.off()`
+Components typically use `Deus.on()` in their `load()` function, and `Deus.off()`
 in their `unload()` function.  Alternatively a one-time listener can be
-created anywhere with `Ev.once()`.
+created anywhere with `Deus.once()`.
 
-> `Ev.on(eventName[, callback])`
+> `Deus.on(eventName[, callback])`
 
-> `Ev.off(eventName[, callback])`
+> `Deus.off(eventName[, callback])`
 
-> `Ev.once(eventName[, callback])`
+> `Deus.once(eventName[, callback])`
 
 The callback will receive a single argument which is the data sent by the 
 emitter.
@@ -267,36 +264,36 @@ emitter.
 
 Components emit an event that another is listening for:
 
-> `Ev.emit(eventName[, data])`
+> `Deus.emit(eventName[, data])`
 
 
 ## Global State
 
-Setting global states doesn't trigger any rerender unless you call `.setState({})` on the 
+Setting global states doesn't trigger any rerender unless you call `.set({})` on the 
 component that should be rechecked.
 
-> `State.set({key1: val1[, key2: val2, ...]})`
+> `Deus.set({key1: val1[, key2: val2, ...]})`
 
-> `var value = State.key1`
+> `var value = Deus.state.key1`
 
 
 ## Config 
 
-You can change the path of where components are kept by changing the value of `Cfg.sp` for navigation screens and `Cfg.cp` for other components.  
+You can change the path of where components are kept by changing the value of `Deus.sp` for navigation screens and `Deus.cp` for other components.  
 
 Store all components in the `cmp` directory: 
 
-`Cfg.sp = Cfg.cp;`.
+`Deus.sp = Deus.cp;`.
 
 Use `this.use()` with a component from the `scr` directory: 
 
 ```javascript
-module.exports = class Example extends Cmp {
-    useScr = (n, u, t) => {t = Cfg.cp; Cfg.cp = Cfg.sp; u = this.use(n); Cfg.cp = t; return u)};
+module.exports = class Example extends Deus.Cmp {
+    useScr = (n, u, t) => {t = Deus.cp; Deus.cp = Deus.sp; u = this.use(n); Deus.cp = t; return u)};
     html() {
         return `${this.useScr('ScreenComponentName')}`;
     }
 }
 ```
 
-The default value for `Cfg.sp` is `'./scr/'` and for `Cfg.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
+The default value for `Deus.sp` is `'./scr/'` and for `Deus.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
