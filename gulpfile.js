@@ -8,9 +8,9 @@ gulp.task('deus', function () {
   return gulp.src('./src.js')
     .pipe(terser({
         ecma: 6,
-        warnings: 'verbose',
-        module: true,
-        toplevel: true,
+        mangle: {
+          toplevel: true,
+        },
       }))
     .pipe(rename("deus.js"))
     .pipe(gulp.dest('./'));

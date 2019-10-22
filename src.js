@@ -88,12 +88,12 @@ r = (c, h, m) => {
 	c.c = c.c.filter(v => v.r && (!v.unload || v.unload() || 1));
 };
 
-q = (x, y, z) => {
-	return x === y || typeof x == "function" && y && x.toString() == y.toString()
-      || x && y && typeof x == "object" && x.constructor == y.constructor
-      && (z = Object.keys(y)) && z.length == Object.keys(x).length
-      && !z.find(v => !q(x[v], y[v]));
-};
+q = (x, y, z) => (
+	x === y || typeof x == "function" && y && x.toString() == y.toString()
+        || x && y && typeof x == "object" && x.constructor == y.constructor
+        && (z = Object.keys(y)) && z.length == Object.keys(x).length
+        && !z.find(v => !q(x[v], y[v]))
+);
 
 class X {
 	constructor() {
@@ -164,4 +164,3 @@ class X {
 
 P = new DOMParser(), D = document, A = Array.prototype, O = Object.assign;
 module.exports = {Deus: X.i()};
-
