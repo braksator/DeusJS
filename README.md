@@ -1,6 +1,6 @@
-[![npm](https://img.shields.io/npm/dt/deus.svg)](#)
+[![npm](https://img.shields.io/npm/dt/deusjs.svg)](#)
 
-DEUSJS
+DeusJS
 ===========
 
 > \[**dey** -uh s **jey**-uh s\]
