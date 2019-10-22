@@ -3,10 +3,12 @@
 DEUSJS
 ===========
 
-> \[ **dey** -uh s **jey**-uh s \]
+> \[**dey** -uh s **jey**-uh s\]
 
 **A very lightweight front-end framework inspired by React but easier to learn
 and use.**
+
+> Warning: This package is new and under development.
 
 If you know HTML and JavaScript, you can learn DeusJS very quickly.
 
