@@ -24,7 +24,7 @@ If you know HTML and JavaScript, you can learn DeusJS very quickly.
 
 ## Usage
 
-Get your hands on `deus.min.js` and `require()` the file.
+Get your hands on [deus.min.js](https://raw.githubusercontent.com/braksator/DeusJS/master/deus.min.js) and `require()` the file.
 
 Everywhere you use DeusJS you'll have to require DeusJS in your project:
 
