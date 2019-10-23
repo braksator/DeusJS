@@ -16,6 +16,12 @@ class DeusJS {
                 mapDom(containerElement), 
                 containerElement
             ),
+            l: (cmp, props, dir, parent, tmp, component) => (
+                component = new (deusInstance.r[cmp] || typeof cmp != 'string' && (tmp = cmp, cmp = cmp.constructor.name) && tmp || require(deusInstance[dir] + cmp))(),
+                ObjAssign(component, {props: props, p: parent, n: cmp, i: Math.random() + Date.now()}),
+                !component.load || component.load(),
+                component
+            ),
             sp: './scr/', 
             cp: './cmp/', 
 
@@ -31,19 +37,12 @@ class DeusJS {
                     render(this);
                 }
                 
-                use(componentName, props, component) {
-                    component = this.c.find(cmp => componentName == cmp.n && deepEqual(props, cmp.p));
+                use(cmp, props, component) {
+                    component = this.c.find(cmp => cmp == cmp.n && deepEqual(props, cmp.p));
                     component = component && component.c;
                     
-                    if (!component) {			
-                        component = new (deusInstance.r[componentName] || typeof componentName != 'string' && componentName || require(deusInstance.cp + componentName))();
-                        
-                        component.props = props;
-                        component.p = this;
-                        component.n = componentName;
-                        component.i = Math.random() + Date.now();
-
-                        !component.load || component.load();
+                    if (!component) {	
+                        component = deusInstance.l(cmp, props, 'cp', this);
                         this.c.push(component);
                     }
                     
@@ -58,43 +57,44 @@ class DeusJS {
         return this.j = this.j || new this();
     }
     
-    go(componentName, props, containerElement = doc.body, component) {
-		component = new (this.r[componentName] || typeof componentName != 'string' && componentName || require(this.sp + componentName))();
-        component.props = props;
-		!component.load || component.load();
-        history.pushState('', component.title, componentName);
-		this.h.push({s: componentName, p: props, c: component, e: containerElement});        
+    go(cmp, props, containerElement = doc.body, component) {
+        component = deusInstance.l(cmp, props, 'sp');
+        
+        history.pushState(props, component.title, component.n);
+		deusInstance.h.push(component);        
 		render(component, containerElement);
     }
 
     back(numSteps) {
-        this.h.pop();
+        deusInstance.h.pop();
         history.go(numSteps || 1 * -1);
     }
     
     on(eventName, callback) {
-        (this.e[eventName] || (this.e[eventName] = [])).push(callback);
+        (deusInstance.e[eventName] || (deusInstance.e[eventName] = [])).push(callback);
     }
 
     once(eventName, callback) {
-        this.on(eventName, x => {this.off(eventName, callback); callback(x)});
+        deusInstance.on(eventName, x => {deusInstance.off(eventName, callback); callback(x)});
     }
 
     emit(eventName, data) {
-        this.e[eventName].forEach(callback => callback(data));
+        deusInstance.e[eventName].forEach(callback => callback(data));
     }
 
     off(eventName, callback) {
-        this.e[eventName] = this.e[eventName].filter(x => !deepEqual(x, callback));
-        this.e[eventName].length || delete this.e[eventName];
+        deusInstance.e[eventName] = deusInstance.e[eventName].filter(x => !deepEqual(x, callback));
+        deusInstance.e[eventName].length || delete deusInstance.e[eventName];
     }
 
 	set(state) {
-		ObjAssign(this.state, state);
+		ObjAssign(deusInstance.state, state);
 	}
 };
 
 let mapDom = (element, component, isSVG, node) => [...element.children].map(child => {
+    if (element.tagName == 'c-')
+        return mapDom(element, component);
     node = {
         c: child.children && child.children.length ? null : child.textContent,
         a: child.nodeType != 1 ? [] : [...child.attributes].map(attribute => ({n: attribute.name, v: attribute.value})),
