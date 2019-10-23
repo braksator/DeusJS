@@ -77,9 +77,9 @@ Create a directory named `scr` and then create a file inside named `HelloWorld.j
 possible to reconfigure the default directory path (see "Config").
 
 ```javascript
-const Deus = require('deusjs').Deus;
+const MyApp = require('deusjs');
 
-module.exports = class HelloWorld extends Deus.Cmp {
+module.exports = class HelloWorld extends MyApp.Cmp {
     title = 'My Hello World component';
     html() {
         return `
@@ -105,19 +105,19 @@ Your app.js:
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function(){
-    const Deus = require('deusjs').Deus;
+    const MyApp = require('deusjs');
 
     // Navigate to HelloWorld screen.
-    Deus.go('HelloWorld');
+    MyApp.go('HelloWorld');
 });
 ```
 
 Since we're navigating to this component it will be the root component of the app,
 it is essentially the screen container, it has no parent.  It will automatically replace
 the `body` of your document unless the `container` argument is supplied in 
-`Deus.go()` which would be a HTMLElement selected from the DOM:
+`MyApp.go()` which would be a HTMLElement selected from the DOM:
 
-> `Deus.go(screenName[, props, container])`
+> `MyApp.go(screenName[, props, container])`
 
 You don't need to import or require the component, it will be autoloaded.
 
@@ -169,7 +169,7 @@ directory will store components that will never be used as root level screens.
 Now create a file called `SampleText.js` with the following code:
 
 ```javascript 
-module.exports = class SampleText extends Deus.Cmp {
+module.exports = class SampleText extends MyApp.Cmp {
     html() {
         return "Lorem Ipsum Dolor Sit Amet";
     }
@@ -201,7 +201,7 @@ Here are all the member functions you can implement.
 
 Some other things you can access:
 
-- `this.props` The props passed in from a parent's `this.use()` or via `Deus.go()`.
+- `this.props` The props passed in from a parent's `this.use()` or via `MyApp.go()`.
 - `this.state` The state object resulting from your calls to `this.set()`. 
 - `this.c` Array of children, each in the format of an object with keys `n` (name), `p` (props), and `c` (component).
 - `this.p` Parent component (will be undefined for the root component).
@@ -219,11 +219,11 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `Deus.go(screenName[, props, container, callback])`
+> `MyApp.go(screenName[, props, container, callback])`
 
-> `Deus.back([numberOfSteps, ..?])`
+> `MyApp.back([numberOfSteps, ..?])`
 
-The `callback` arg in `Deus.go()` is used to supply a custom way to attach 
+The `callback` arg in `MyApp.go()` is used to supply a custom way to attach 
 the element to the DOM, e.g. to facilitate a transition.  To emulate the 
 default behaviour:
 
@@ -245,15 +245,15 @@ Components can communicate and pass data via the event emitter and listeners.
 
 ### Listening for an event
 
-Components typically use `Deus.on()` in their `load()` function, and `Deus.off()`
+Components typically use `MyApp.on()` in their `load()` function, and `MyApp.off()`
 in their `unload()` function.  Alternatively a one-time listener can be
-created anywhere with `Deus.once()`.
+created anywhere with `MyApp.once()`.
 
-> `Deus.on(eventName[, callback])`
+> `MyApp.on(eventName[, callback])`
 
-> `Deus.off(eventName[, callback])`
+> `MyApp.off(eventName[, callback])`
 
-> `Deus.once(eventName[, callback])`
+> `MyApp.once(eventName[, callback])`
 
 The callback will receive a single argument which is the data sent by the 
 emitter.
@@ -262,7 +262,7 @@ emitter.
 
 Components emit an event that another is listening for:
 
-> `Deus.emit(eventName[, data])`
+> `MyApp.emit(eventName[, data])`
 
 
 ## Global State
@@ -270,28 +270,41 @@ Components emit an event that another is listening for:
 Setting global states doesn't trigger any rerender unless you call `.set({})` on the 
 component that should be rechecked.
 
-> `Deus.set({key1: val1[, key2: val2, ...]})`
+> `MyApp.set({key1: val1[, key2: val2, ...]})`
 
-> `var value = Deus.state.key1`
+> `var value = MyApp.state.key1`
 
 
 ## Config 
 
-You can change the path of where components are kept by changing the value of `Deus.sp` for navigation screens and `Deus.cp` for other components.  
+### Configure component autoloading
+
+You can change the path of where components are kept by changing the value of `MyApp.sp` for navigation screens and `MyApp.cp` for other components.  
 
 Store all components in the `cmp` directory: 
 
-`Deus.sp = Deus.cp;`.
+`MyApp.sp = MyApp.cp;`.
 
-Use `this.use()` with a component from the `scr` directory: 
+The default value for `MyApp.sp` is `'./scr/'` and for `MyApp.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
+
+### Autoloading
+
+You can bypass autoloading altogether by registering the components before using them:
 
 ```javascript
-module.exports = class Example extends Deus.Cmp {
-    useScr = (n, u, t) => {t = Deus.cp; Deus.cp = Deus.sp; u = this.use(n); Deus.cp = t; return u)};
+// Create component.
+class ManuallyRegisteredComponent extends MyApp.Cmp {
     html() {
-        return `${this.useScr('ScreenComponentName')}`;
+        return `This component is not in /cmp/ManuallyRegisteredComponent.js`;
     }
 }
-```
 
-The default value for `Deus.sp` is `'./scr/'` and for `Deus.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
+// Register it.
+MyApp.r['ManuallyRegisteredComponent'] = ManuallyRegisteredComponent;
+
+// Use it
+MyApp.go('ManuallyRegisteredComponent');
+
+// Delete from registry if you know you're not going to need it again, to free memory.
+delete MyApp.r['ManuallyRegisteredComponent'];
+```

@@ -4,7 +4,7 @@
 
 class DeusJS {
 	constructor() {
-		ObjAssign(this, {c: {}, e: {}, state: {}, h: [], sp: './scr/', cp: './cmp/', Cmp: class {
+		ObjAssign(this, {c: {}, e: {}, state: {}, h: [], r: {}, sp: './scr/', cp: './cmp/', Cmp: class {
 
 			constructor() {
 				this.state = {}; 
@@ -21,7 +21,7 @@ class DeusJS {
                 component = component && component.c;
                 
 				if (!component) {			
-					component = new (require(DeusJS.i().cp + componentName))();
+					component = new (deusInstance.r[componentName] || require(deusInstance.cp + componentName))();
 					component.props = props;
 					component.p = this;
 					!component.load || component.load();
@@ -40,7 +40,7 @@ class DeusJS {
     }
     
     go(componentName, props, element = doc.body, attachCallback, component) {
-		component = new (require(this.sp + componentName))();
+		component = new (this.r[componentName] || require(this.sp + componentName))();
 		component.props = props;
 		!component.load || component.load();
         history.pushState('', component.title, componentName);
@@ -163,9 +163,11 @@ deepEqual = (a, b, temp) => (
         && !temp.find(v => !deepEqual(a[v], b[v]))
 ),
 
+
 domParser = new DOMParser(), 
 doc = document, 
 ObjAssign = Object.assign,
-ObjKeys = Object.keys;
+ObjKeys = Object.keys,
+deusInstance = DeusJS.i();
 
-module.exports = {Deus: DeusJS.i()};
+module.exports = deusInstance;
