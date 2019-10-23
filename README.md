@@ -164,6 +164,18 @@ a component called "SampleText" is inserted.
 
 You don't need to import or require the SampleText component, it will be autoloaded.
 
+You don't have to use the autoloading feature:
+
+```javascript
+const SampleText = require('SampleText');
+
+    html() {
+        return `
+            <p>${this.use(SampleText)}</p>
+        `;
+    }
+```
+
 > `this.use(screenName[, props])`
 
 To create the SampleText component:
@@ -208,7 +220,7 @@ Some other things you can access:
 - `this.state` The state object resulting from your calls to `this.set()`. 
 - `this.c` Array of children, each in the format of an object with keys `n` (name), `p` (props), and `c` (component).
 - `this.p` Parent component (will be undefined for the root component).
-- `this.l` The HTMLElement parsed from the component's HTML.
+- `this.e` The HTMLElement parsed from the component's HTML.
 - `this.r` An internally used rendering flag, modifying this may lead to undefined behaviour.
 
 > You can manipulate parent and child components, e.g. 
@@ -282,37 +294,6 @@ Store all components in the `cmp` directory:
 `MyApp.sp = MyApp.cp;`.
 
 The default value for `MyApp.sp` is `'./scr/'` and for `MyApp.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
-
-### Non-autoloading alternatives
-
-You can bypass autoloading altogether by registering the components before using them:
-
-```javascript
-// Create component.
-class ManuallyRegisteredComponent extends MyApp.Cmp {
-    html() {
-        return `This component is not in /cmp/ManuallyRegisteredComponent.js`;
-    }
-}
-
-// Register it.
-MyApp.r['ManuallyRegisteredComponent'] = ManuallyRegisteredComponent;
-
-// Use it
-MyApp.go('ManuallyRegisteredComponent');
-
-// Delete from registry if you know you're not going to need it again, to free memory.
-delete MyApp.r['ManuallyRegisteredComponent'];
-```
-
-You don't neccessarily have to key the registry by the class' actual name.
-
-Or skip the registry too, and use the class directly:
-
-```javascript
-MyApp.go(ManuallyRegisteredComponent);
-```
-
 
 ### Configure DOM attachment
 
