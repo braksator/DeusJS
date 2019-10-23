@@ -193,10 +193,10 @@ that has caused the return value of html() to change.
 
 Here are all the member functions you can implement.
 
-- `html()` Returns the HTML template of your component.
 - `load()` Called when the component is loaded.
+- `html()` Return the HTML template of your component, called prior to every potential rerender.
+- `post()` Called after the HTML is rendered.
 - `unload()` Called when the component is about to unload.
-- `post()` Called when the HTML is rendered.
 
 ### Component data
 
