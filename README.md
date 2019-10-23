@@ -90,7 +90,9 @@ module.exports = class HelloWorld extends MyApp.Cmp {
 }
 ```
 Note the use of backticks around the HTML, this will allow executing JavaScript 
-code inside the HTML using `${expression}` placeholders.
+code inside the HTML using `${expression}` placeholders.  If you're unfamiliar
+with this type of JavaScript syntax check out 
+[Template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
 Tip: There are Visual Studio Code extensions that will syntax highlight the HTML here, 
 you can find them by searching for "es6-string" in the extensions marketplace.
