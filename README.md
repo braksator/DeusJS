@@ -168,9 +168,7 @@ Create a directory named `cmp` where your `scr` directory is located.  This
 directory will store components that will never be used as root level screens.
 Now create a file called `SampleText.js` with the following code:
 
-```javascript    
-const Deus = require('deusjs').Deus; 
-
+```javascript 
 module.exports = class SampleText extends Deus.Cmp {
     html() {
         return "Lorem Ipsum Dolor Sit Amet";

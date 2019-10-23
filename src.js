@@ -1,6 +1,7 @@
 /**
- * DeusJS.
+ * DeusJS
  */
+
 class DeusJS {
 	constructor() {
 		ObjAssign(this, {c: {}, e: {}, state: {}, h: [], sp: './scr/', cp: './cmp/', Cmp: class {
@@ -16,7 +17,7 @@ class DeusJS {
             }
             
 			use(componentName, props, component) {
-				component = this.c.find(y => (componentName == y.n && deepEquals(props, y.p)));
+				component = this.c.find(y => componentName == y.n && deepEqual(props, y.p));
                 component = component && component.c;
                 
 				if (!component) {			
@@ -38,16 +39,14 @@ class DeusJS {
         return this.j = this.j || new this();
     }
     
-    go(componentName, props, container = doc.body, attachCallback, component) {
+    go(componentName, props, element = doc.body, attachCallback, component) {
 		component = new (require(this.sp + componentName))();
 		component.props = props;
 		!component.load || component.load();
-		this.c[componentName] = component;
         history.pushState('', component.title, componentName);
-		this.h.push({s: componentName, p: props, c: container});
-		console.log("this.stack is:", this.h);
+		this.h.push({s: componentName, p: props, c: component, e: element});        
 		render(component);
-		attachCallback && attachCallback(component) || (container.innerHTML = ' ', container.append(component.l));
+		attachCallback && attachCallback(component) || (element.innerHTML = ' ', element.append(component.l));
     }
 
     back(numSteps) {
@@ -68,7 +67,7 @@ class DeusJS {
     }
 
     off(eventName, callback) {
-        this.e[eventName] = this.e[eventName].filter(x => !deepEquals(x, callback));
+        this.e[eventName] = this.e[eventName].filter(x => !deepEqual(x, callback));
         this.e[eventName].length || delete this.e[eventName];
     }
 
@@ -77,129 +76,95 @@ class DeusJS {
 	}
 };
 
-let mapDOM = (element, isSVG, details) => (arrProto.map.call(element.childNodes, (node => {
-    details = {
-        c: node.childNodes && node.childNodes.length ? null : node.textContent,
-        a: node.nodeType != 1 ? [] : arrProto.map.call(node.attributes, attribute => ({a: attribute.n, v: attribute.v})),
-        t: node.nodeType == 3 ? 'text' : (node.nodeType == 8 ? 'comment' : node.tagName.toLowerCase()),
-        n: node
+let mapDom = (element, isSVG, domItem) => [...element.children].map(child => {
+    domItem = {
+        c: child.children && child.children.length ? null : child.textContent,
+        a: child.nodeType != 1 ? [] : [...child.attributes].map(attribute => ({n: attribute.name, v: attribute.value})),
+        t: child.nodeType == 3 ? 'text' : (child.nodeType == 8 ? 'comment' : child.tagName.toLowerCase()),
+        e: child
     };
-    details.s = isSVG || details.t == 'svg';
-    details.k = mapDOM(node, details.s);
-    return details;
-}))),
+    domItem.s = isSVG || domItem.t == 'svg';
+    domItem.k = mapDom(child, domItem.s);
+    return domItem;
+}),
 
-addAttributes = (element, attributes, styleMap, remove, styleArray) => {
-    attributes.forEach(attribute => {
-        if (attribute.a == 'class')
-            element.className = attribute.v;
-
-        else if (attribute.a == 'style') {
+addAttributes = (element, attributes, styleMap) => {
+    attributes.forEach(attribute => 
+        attribute.n == 'class' ? (element.className = attribute.v) : attribute.n == 'style' ? (
             styleMap = attribute.v.split(';').reduce((arr, style) => {
-                if (~style.trim().indexOf(':')) {
-                    styleArray = style.split(':');
-                    arr.push({
-                        name: styleArray[0] ? styleArray[0].trim() : '',
-                        value: styleArray[1] ? styleArray[1].trim() : ''
-                    });
-                }
+                ~style.trim().indexOf(':') && arr.push(style.split(':'));
                 return arr;
-            }, []);
-
-            remove = arrProto.filter.call(
-                element.style, style => (
-                    !styleMap.find(
-                        newStyle => (newStyle.name == style && newStyle.value == element.style[style])
-                    )
-                )
-            );
-
-            remove.forEach(s => element.style[s] = '');
-            styleMap.forEach(s => element.style[s.name] = s.value);
-        } 
-        else
-            element.setAttribute(attribute.a, attribute.v || !0);
-    });
+            }, []).forEach(style => element.style[style[0]] = style[1]),
+            [...element.style].filter(style => !styleMap.find(
+                newStyle => newStyle[0] == style && newStyle[1] == element.style[style]
+            )).forEach(style => element.style[style] = '')
+        ) : element.setAttribute(attribute.n, attribute.v || !0)
+    );
 },
 
-createElement = (element, node) => {
-    element.t == 'text' && (node = doc.createTextNode(element.c))
-        || element.t == 'comment' && (doc.createComment(element.c))
-        || element.s && (doc.createElementNS('http://www.w3.org/2000/svg', element.t))
-        || (node = doc.createElement(element.t));
+createElement = (domItem, element) => {
+    domItem.t == 'text' && (element = doc.createTextNode(domItem.c))
+        || domItem.t == 'comment' && doc.createComment(domItem.c)
+        || domItem.s && doc.createElementNS('http://www.w3.org/2000/svg', domItem.t)
+        || (element = doc.createElement(domItem.t));
 
-    addAttributes(node, element.a);
+    addAttributes(element, domItem.a);
 
-    element.k.length && element.k.forEach(childElement => node.appendChild(createElement(childElement)))
-        || element.t != 'text' && (node.textContent = element.c);
+    domItem.k.length && domItem.k.forEach(childItem => element.appendChild(createElement(childItem)))
+        || domItem.t != 'text' && (element.textContent = domItem.c);
 
-    return node;
+    return element;
 },
 
-diffDOM = (newMap, domMap, element, temp) => {
+diffDom = (newMap, domMap, element, temp) => {
     console.log("d func");
     for (temp = domMap.length; temp > newMap.length; temp--)
-        //y[g].n.parentNode.removeChild(y[g].n);
-        element.removeChild(domMap[temp].n);
+        element.removeChild(domMap[temp].e);
 
-    newMap.forEach((node, index, details) => {
-        details = domMap[index];
-        console.log("eaching nodes:", node, index);
+    newMap.forEach((newItem, index, domItem) => 
+        !(domItem = domMap[index]) ? element.appendChild(createElement(newItem)) : newItem.t != domItem.t ? element.replaceChild(createElement(newItem), domItem.e) : (
+            addAttributes(domItem.e, newItem.a.filter(domAttribute => {
+                temp = find(domItem.a, newAttribute => (domAttribute.n == newAttribute.n));
+                return !temp || temp.v != domAttribute.v;
+            })),
+    
+            domItem.a.filter(attribute => (!newItem.a.find(newAttribute => (attribute.n == newAttribute.n)))).forEach(a => {
+                a.n == 'class' && (domItem.e.className = '')
+                    || a.n == 'style' && [...domItem.e.style].forEach(s => domItem.e.style[s] = '')
+                    || domItem.e.removeAttribute(a.n);
+            }),
+    
+            console.log("newItem", newItem, "domItem.", domItem),
+            newItem.c != domItem.c && (domItem.e.textContent = newItem.c),
 
-        if (!details)
-            return element.appendChild(createElement(node));
-        if (node.t != details.t)
-            return element.replaceChild(createElement(node), details.n);
-        addAttributes(details.n, node.a.filter(a => {
-            temp = find(details.a, f => (a.a == f.a));
-            return !temp || temp.value != a.value;
-        }));
-
-        details.a.filter(attribute => (!node.a.find(newAttribute => (attribute.a == newAttribute.a)))).forEach(a => {
-            a.a == 'class' && (details.n.className = '')
-                || a.a == 'style' && arrProto.slice.call(details.n.style).forEach(s => details.n.style[s] = '')
-                || details.n.removeAttribute(a.a);
-        });
-
-        console.log("n.c.", node.c, "j.c.", details.c, "j node:" , details.n, 'typeof j.n', typeof details.n, details.n.constructor);
-        node.c != details.c && (details.n.textContent = node.c);
-
-        if (/*j.k.length &&*/ !node.k.length)
-            details.n.innerHTML = '';
-            
-        else if (!details.k.length/* && n.k.length*/) {
-            temp = doc.createDocumentFragment();
-            diffDOM(node.k, details.k, temp);
-            element.appendChild(temp);
-        }
-        else 
-            diffDOM(node.k, details.k, details.n);
-
-    });
+            !!(domItem.k.length ^ newItem.k.length) ? diffDom(newItem.k, domItem.k, domItem.e) : domItem.k.length ? (domItem.e.innerHTML = '') : (
+                temp = doc.createDocumentFragment(),
+                diffDom(newItem.k, domItem.k, temp),
+                element.appendChild(temp)
+            )
+        )
+    );
 },
 
 render = (component, element) => {
-	component.c.forEach(child => child.r = 0);
+	component.c.forEach(child => child.r = 1);
     element = domParser.parseFromString(component.html(), 'text/html').body.firstChild;
-    //h = n.childNodes.length && div : h.firstChild;
-
-    component.l && diffDOM(mapDOM(element), mapDOM(component.l), component.l.parentNode);
+    component.l && diffDom(mapDom(element), mapDom(component.l), component.l.parentNode);
     component.l = element;
-	component.r = 1;
+	component.r = 0;
 	!component.post || component.post();
 	component.c = component.c.filter(child => child.r && (!child.unload || child.unload() || 1));
 },
 
-deepEquals = (a, b, temp) => (
+deepEqual = (a, b, temp) => (
 	a === b || typeof a == "function" && b && a.toString() == b.toString()
         || a && b && typeof a == "object" && a.constructor == b.constructor
         && (temp = ObjKeys(b)) && temp.length == ObjKeys(a).length
-        && !temp.find(v => !deepEquals(a[v], b[v]))
+        && !temp.find(v => !deepEqual(a[v], b[v]))
 ),
 
 domParser = new DOMParser(), 
 doc = document, 
-arrProto = Array.prototype,
 ObjAssign = Object.assign,
 ObjKeys = Object.keys;
 
