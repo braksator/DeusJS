@@ -243,6 +243,8 @@ Basic navigation is demonstrated above with the HelloWorld example.
 
 > `MyApp.back([numberOfSteps, ..?])`
 
+Screen titles are set by the component's `title` property.
+
 You don't need to configure any navigation paths, 
 the navigation system will just load and render components as needed, and
 the URL will be appended with the component's name.  However you can do 
