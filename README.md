@@ -50,7 +50,7 @@ page like so:
     <head>
         <title>Your project name</title>
         <meta charset="UTF-8">
-        <link rel='stylesheet' href='global.css'>
+        <link rel="stylesheet" href="global.css">
     </head>
     <body>
         <div id="my-splash-page">
