@@ -283,7 +283,7 @@ Store all components in the `cmp` directory:
 
 The default value for `MyApp.sp` is `'./scr/'` and for `MyApp.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
 
-### Non-autoloading alternative
+### Non-autoloading alternatives
 
 You can bypass autoloading altogether by registering the components before using them:
 
@@ -306,6 +306,13 @@ delete MyApp.r['ManuallyRegisteredComponent'];
 ```
 
 You don't neccessarily have to key the registry by the class' actual name.
+
+Or skip the registry too, and use the class directly:
+
+```javascript
+MyApp.go(ManuallyRegisteredComponent);
+```
+
 
 ### Configure DOM attachment
 

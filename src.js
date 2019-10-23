@@ -36,7 +36,7 @@ class DeusJS {
                     component = component && component.c;
                     
                     if (!component) {			
-                        component = new (deusInstance.r[componentName] || require(deusInstance.cp + componentName))();
+                        component = new (deusInstance.r[componentName] || typeof componentName != 'string' && componentName || require(deusInstance.cp + componentName))();
                         
                         component.props = props;
                         component.p = this;
@@ -58,8 +58,8 @@ class DeusJS {
         return this.j = this.j || new this();
     }
     
-    go(componentName, props, containerElement = doc.body, attachCallback, component) {
-		component = new (this.r[componentName] || require(this.sp + componentName))();
+    go(componentName, props, containerElement = doc.body, component) {
+		component = new (this.r[componentName] || typeof componentName != 'string' && componentName || require(this.sp + componentName))();
         component.props = props;
 		!component.load || component.load();
         history.pushState('', component.title, componentName);
@@ -166,14 +166,10 @@ diffDom = (newMap, containerMap, containerElement, temp) => {
     );
 },
 
-
 render = (component, containerElement, element) => {
     element = domParser.parseFromString(component.html(), 'text/html').body.firstChild;
     component.c.forEach(child => child.r = 1);
-    if (!containerElement) {
-        containerElement = doc.createDocumentFragment();
-    }
-    deusInstance.a(component, element, containerElement);
+    deusInstance.a(component, element, containerElement || doc.createDocumentFragment());
     component.l = element;
 	component.r = 0;
     !component.post || component.post();
