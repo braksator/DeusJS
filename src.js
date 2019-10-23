@@ -41,7 +41,7 @@ class DeusJS {
     
     go(componentName, props, element = doc.body, attachCallback, component) {
 		component = new (this.r[componentName] || require(this.sp + componentName))();
-		component.props = props;
+        component.props = props;
 		!component.load || component.load();
         history.pushState('', component.title, componentName);
 		this.h.push({s: componentName, p: props, c: component, e: element});        
@@ -117,7 +117,6 @@ createElement = (domItem, element) => {
 },
 
 diffDom = (newMap, domMap, element, temp) => {
-    console.log("d func");
     for (temp = domMap.length; temp > newMap.length; temp--)
         element.removeChild(domMap[temp].e);
 
@@ -134,9 +133,7 @@ diffDom = (newMap, domMap, element, temp) => {
                     || domItem.e.removeAttribute(a.n);
             }),
     
-            console.log("newItem", newItem, "domItem.", domItem),
             newItem.c != domItem.c && (domItem.e.textContent = newItem.c),
-
             !!(domItem.k.length ^ newItem.k.length) ? diffDom(newItem.k, domItem.k, domItem.e) : domItem.k.length ? (domItem.e.innerHTML = '') : (
                 temp = doc.createDocumentFragment(),
                 diffDom(newItem.k, domItem.k, temp),
@@ -147,12 +144,12 @@ diffDom = (newMap, domMap, element, temp) => {
 },
 
 render = (component, element) => {
-	component.c.forEach(child => child.r = 1);
+    component.c.forEach(child => child.r = 1);
     element = domParser.parseFromString(component.html(), 'text/html').body.firstChild;
     component.l && diffDom(mapDom(element), mapDom(component.l), component.l.parentNode);
     component.l = element;
 	component.r = 0;
-	!component.post || component.post();
+    !component.post || component.post();
 	component.c = component.c.filter(child => child.r && (!child.unload || child.unload() || 1));
 },
 
@@ -162,7 +159,6 @@ deepEqual = (a, b, temp) => (
         && (temp = ObjKeys(b)) && temp.length == ObjKeys(a).length
         && !temp.find(v => !deepEqual(a[v], b[v]))
 ),
-
 
 domParser = new DOMParser(), 
 doc = document, 
