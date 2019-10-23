@@ -57,7 +57,7 @@ page like so:
             This is the document we'll see until we call Nav.go() in app.js
             so this can be used as a splash page until things are ready.
         </div>
-        <script src="app.js"></script>
+        <script src="myApp.js"></script>
     </body>
 </html>
 ```
@@ -67,7 +67,7 @@ back-end doesn't load this for you in some other way).  Note also that we've
 used a global stylesheet as this lets us set up our common styles, which may be 
 a prefered way to approach styling for many projects.
 
-See the "HelloWorld example" below for an idea of how to write your `App.js`.
+See the "HelloWorld example" below for an idea of how to write your `myApp.js`.
 
 
 ## Creating a component
@@ -102,7 +102,7 @@ Note how a value was set to the `title` property, this is not neccessary for
 most components, but this component will be treated as a navigation screen,
 and the `title` property is recognised by the navigation system.
 
-Your app.js:
+Your myApp.js:
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function(){
