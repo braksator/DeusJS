@@ -9,7 +9,8 @@ class DeusJS {
             c: {}, 
             e: {}, 
             state: {}, 
-            h: [],
+            h: [], 
+            r: {}, 
             a: (component, element, containerElement) => diffDom(
                 mapDom(element, component), 
                 mapDom(containerElement), 
@@ -35,7 +36,7 @@ class DeusJS {
                     component = component && component.c;
                     
                     if (!component) {			
-                        component = new (typeof componentName != 'string' && componentName || require(deusInstance.cp + componentName))();
+                        component = new (deusInstance.r[componentName] || typeof componentName != 'string' && componentName || require(deusInstance.cp + componentName))();
                         
                         component.props = props;
                         component.p = this;
@@ -58,7 +59,7 @@ class DeusJS {
     }
     
     go(componentName, props, containerElement = doc.body, component) {
-		component = new (typeof componentName != 'string' && componentName || require(this.sp + componentName))();
+		component = new (this.r[componentName] || typeof componentName != 'string' && componentName || require(this.sp + componentName))();
         component.props = props;
 		!component.load || component.load();
         history.pushState('', component.title, componentName);

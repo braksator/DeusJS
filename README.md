@@ -15,7 +15,7 @@ If you know HTML and JavaScript, you can learn DeusJS very quickly.
 - Create components with props and state using actual HTML to template the output
 - Navigation between 'screen' components
 - Autoloading of all components, no need to import/require components or 
-  configure nav data in the app.
+  configure nav data in the app. (However, you absolutely can!)
 - Easy events/triggering/messaging between components.
 - Easy access to parent and children components.
 - Access to a global state.
@@ -243,9 +243,26 @@ Basic navigation is demonstrated above with the HelloWorld example.
 
 > `MyApp.back([numberOfSteps, ..?])`
 
-There is no central data store of navigation paths or anything like that, 
+You don't need to configure any navigation paths, 
 the navigation system will just load and render components as needed, and
-the URL will be appended with the component's name.
+the URL will be appended with the component's name.  However you can do 
+this if you want to:
+
+```javascript
+// Register it.
+myApp.r['some/uri/here'] = ComponentClass;
+
+// Use it.
+myApp.go('some/uri/here');
+
+// Free up memory if no longer needed.
+delete myApp['some/uri/here'];
+
+```
+These can be dynamically added and deleted at runtime as required.  
+> This registry can be used to cache any component class for future use, and 
+> bypass the autoloader.
+
 
 ## Events / Triggers / Messaging 
 
