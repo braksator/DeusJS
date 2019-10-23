@@ -29,9 +29,10 @@ Get your hands on [deus.js](https://raw.githubusercontent.com/braksator/DeusJS/m
 Everywhere you use DeusJS you'll have to require DeusJS in your project:
 
 ```javascript
-const Deus = require('./path/to/deus.js').Deus;
+const DeusJS = require('./path/to/deus.js');
 
 ```
+You might name the constant something other than `DeusJS`, perhaps the name of your app.
 
 ### Usage with NPM
 
