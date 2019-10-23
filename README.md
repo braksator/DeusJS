@@ -309,7 +309,7 @@ You don't neccessarily have to key the registry by the class' actual name.
 
 ### Configure DOM attachment
 
-The default DOM diffing and rendering is done by `MyApp.a()`, you can override 
-this function by redefining it.  For example some components may render simply 
-with a straight swap, or render into a cloned page to facilitate a transition. 
-
+The default DOM diffing and rendering is done by `MyApp.a()`, you can override
+this function by redefining it.  For example some components may need to render
+simply with a straight swap, or render into a cloned element to facilitate a
+transition animation. 
