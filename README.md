@@ -269,8 +269,8 @@ Components emit an event that another is listening for:
 
 ## Global State
 
-Setting global states doesn't trigger any rerender unless you call `.set({})` on the 
-component that should be rechecked.
+Setting global states doesn't trigger any rerender unless you also call 
+`this.set({})` within the component that should be rechecked.
 
 > `MyApp.set({key1: val1[, key2: val2, ...]})`
 
