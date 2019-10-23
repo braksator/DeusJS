@@ -209,6 +209,11 @@ Some other things you can access:
 - `this.l` The HTMLElement parsed from the component's HTML.
 - `this.r` An internally used rendering flag, modifying this may lead to undefined behaviour.
 
+> You can manipulate parent and child components, e.g. 
+> `this.p.set({someKey: someValue})`, this circumvents the classic 
+> *reactive* workflow.  But it's your app, you decide how you want
+> to do things, DeusJS lets you be in charge.
+
 ### Styles
 
 DeusJS needs no special facility for styles.  Create global CSS for your 
