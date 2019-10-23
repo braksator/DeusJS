@@ -227,21 +227,9 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `MyApp.go(screenName[, props, container, callback])`
+> `MyApp.go(screenName[, props, container])`
 
 > `MyApp.back([numberOfSteps, ..?])`
-
-The `callback` arg in `MyApp.go()` is used to supply a custom way to attach 
-the element to the DOM, e.g. to facilitate a transition.  To emulate the 
-default behaviour:
-
-```javascript
-let callback = component => {
-    let container = Document.body;
-    container.innerHTML = ' ';
-    container.append(component.l);
-}
-```
 
 There is no central data store of navigation paths or anything like that, 
 the navigation system will just load and render components as needed, and
@@ -273,7 +261,6 @@ Components emit an event that another is listening for:
 
 > `MyApp.emit(eventName[, data])`
 
-
 ## Global State
 
 Setting global states doesn't trigger any rerender unless you also call 
@@ -296,7 +283,7 @@ Store all components in the `cmp` directory:
 
 The default value for `MyApp.sp` is `'./scr/'` and for `MyApp.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
 
-### Autoloading
+### Non-autoloading alternative
 
 You can bypass autoloading altogether by registering the components before using them:
 
@@ -317,3 +304,12 @@ MyApp.go('ManuallyRegisteredComponent');
 // Delete from registry if you know you're not going to need it again, to free memory.
 delete MyApp.r['ManuallyRegisteredComponent'];
 ```
+
+You don't neccessarily have to key the registry by the class' actual name.
+
+### Configure DOM attachment
+
+The default DOM diffing and rendering is done by `MyApp.a()`, you can override 
+this function by defining it.  For example some components may render simply 
+with a straight swap, or render into a cloned page to facilitate a transition. 
+

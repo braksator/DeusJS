@@ -3,50 +3,68 @@
  */
 
 class DeusJS {
-	constructor() {
-		ObjAssign(this, {c: {}, e: {}, state: {}, h: [], r: {}, sp: './scr/', cp: './cmp/', Cmp: class {
+    constructor() {
+        ObjAssign(this, {
+            
+            c: {}, 
+            e: {}, 
+            state: {}, 
+            h: [], 
+            r: {}, 
+            a: (component, element, containerElement) => diffDom(
+                mapDom(element, component), 
+                mapDom(containerElement), 
+                containerElement
+            ),
+            sp: './scr/', 
+            cp: './cmp/', 
 
-			constructor() {
-				this.state = {}; 
-				this.c = [];
-            }
-            
-			set(state) {
-				ObjAssign(this.state, state);
-				render(this);
-            }
-            
-			use(componentName, props, component) {
-				component = this.c.find(y => componentName == y.n && deepEqual(props, y.p));
-                component = component && component.c;
-                
-				if (!component) {			
-					component = new (deusInstance.r[componentName] || require(deusInstance.cp + componentName))();
-					component.props = props;
-					component.p = this;
-					!component.load || component.load();
-					this.c.push({n: componentName, p: props, c: component});
+            Cmp: class {
+
+                constructor() {
+                    this.state = {}; 
+                    this.c = [];
                 }
                 
-				render(component);
-				return component.l.innerHTML;
+                set(state) {
+                    ObjAssign(this.state, state);
+                    render(this);
+                }
+                
+                use(componentName, props, component) {
+                    component = this.c.find(cmp => componentName == cmp.n && deepEqual(props, cmp.p));
+                    component = component && component.c;
+                    
+                    if (!component) {			
+                        component = new (deusInstance.r[componentName] || require(deusInstance.cp + componentName))();
+                        
+                        component.props = props;
+                        component.p = this;
+                        component.n = componentName;
+                        component.i = Math.random() + Date.now();
+
+                        !component.load || component.load();
+                        this.c.push(component);
+                    }
+                    
+                    render(component);
+                    return `<c- i=${component.i}>`;
+                }
             }
-            
-		}});
+        });
     }
     
     static i() {
         return this.j = this.j || new this();
     }
     
-    go(componentName, props, element = doc.body, attachCallback, component) {
+    go(componentName, props, containerElement = doc.body, attachCallback, component) {
 		component = new (this.r[componentName] || require(this.sp + componentName))();
         component.props = props;
 		!component.load || component.load();
         history.pushState('', component.title, componentName);
-		this.h.push({s: componentName, p: props, c: component, e: element});        
-		render(component);
-		attachCallback && attachCallback(component) || (element.innerHTML = ' ', element.append(component.l));
+		this.h.push({s: componentName, p: props, c: component, e: containerElement});        
+		render(component, containerElement);
     }
 
     back(numSteps) {
@@ -76,16 +94,17 @@ class DeusJS {
 	}
 };
 
-let mapDom = (element, isSVG, domItem) => [...element.children].map(child => {
-    domItem = {
+let mapDom = (element, component, isSVG, node) => [...element.children].map(child => {
+    node = {
         c: child.children && child.children.length ? null : child.textContent,
         a: child.nodeType != 1 ? [] : [...child.attributes].map(attribute => ({n: attribute.name, v: attribute.value})),
         t: child.nodeType == 3 ? 'text' : (child.nodeType == 8 ? 'comment' : child.tagName.toLowerCase()),
-        e: child
+        e: child,
+        d: component
     };
-    domItem.s = isSVG || domItem.t == 'svg';
-    domItem.k = mapDom(child, domItem.s);
-    return domItem;
+    node.s = isSVG || node.t == 'svg';
+    node.k = mapDom(child, 0, node.s);
+    return node;
 }),
 
 addAttributes = (element, attributes, styleMap) => {
@@ -102,55 +121,63 @@ addAttributes = (element, attributes, styleMap) => {
     );
 },
 
-createElement = (domItem, element) => {
-    domItem.t == 'text' && (element = doc.createTextNode(domItem.c))
-        || domItem.t == 'comment' && doc.createComment(domItem.c)
-        || domItem.s && doc.createElementNS('http://www.w3.org/2000/svg', domItem.t)
-        || (element = doc.createElement(domItem.t));
+createElement = (node, element) => {
+    
+    if (node.t == 'c-')
+        return node.d.c.find(cmp => cmp.i == node.a.find(i => i.n == 'i').v).l;
 
-    addAttributes(element, domItem.a);
+    node.t == 'text' && (element = doc.createTextNode(node.c))
+        || node.t == 'comment' && doc.createComment(node.c)
+        || node.s && doc.createElementNS('http://www.w3.org/2000/svg', node.t)
+        || (element = doc.createElement(node.t));
 
-    domItem.k.length && domItem.k.forEach(childItem => element.appendChild(createElement(childItem)))
-        || domItem.t != 'text' && (element.textContent = domItem.c);
+    addAttributes(element, node.a);
+
+    node.k.length && node.k.forEach(childNode => element.appendChild(createElement(childNode)))
+        || node.t != 'text' && (element.textContent = node.c);
 
     return element;
 },
 
-diffDom = (newMap, domMap, element, temp) => {
-    for (temp = domMap.length; temp > newMap.length; temp--)
-        element.removeChild(domMap[temp].e);
+diffDom = (newMap, containerMap, containerElement, temp) => {
+    for (temp = containerMap.length; temp > newMap.length; temp--)
+        containerElement.removeChild(containerMap[temp].e);
 
-    newMap.forEach((newItem, index, domItem) => 
-        !(domItem = domMap[index]) ? element.appendChild(createElement(newItem)) : newItem.t != domItem.t ? element.replaceChild(createElement(newItem), domItem.e) : (
-            addAttributes(domItem.e, newItem.a.filter(domAttribute => {
-                temp = find(domItem.a, newAttribute => (domAttribute.n == newAttribute.n));
+    newMap.forEach((newNode, index, containerNode) => 
+        !(containerNode = containerMap[index]) ? containerElement.appendChild(createElement(newNode)) : newNode.t != containerNode.t ? containerElement.replaceChild(createElement(newNode), containerNode.e) : (
+            addAttributes(containerNode.e, newNode.a.filter(domAttribute => {
+                temp = find(containerNode.a, newAttribute => (domAttribute.n == newAttribute.n));
                 return !temp || temp.v != domAttribute.v;
             })),
     
-            domItem.a.filter(attribute => (!newItem.a.find(newAttribute => (attribute.n == newAttribute.n)))).forEach(a => {
-                a.n == 'class' && (domItem.e.className = '')
-                    || a.n == 'style' && [...domItem.e.style].forEach(s => domItem.e.style[s] = '')
-                    || domItem.e.removeAttribute(a.n);
+            containerNode.a.filter(attribute => (!newNode.a.find(newAttribute => (attribute.n == newAttribute.n)))).forEach(a => {
+                a.n == 'class' && (containerNode.e.className = '')
+                    || a.n == 'style' && [...containerNode.e.style].forEach(s => containerNode.e.style[s] = '')
+                    || containerNode.e.removeAttribute(a.n);
             }),
     
-            newItem.c != domItem.c && (domItem.e.textContent = newItem.c),
-            !!(domItem.k.length ^ newItem.k.length) ? diffDom(newItem.k, domItem.k, domItem.e) : domItem.k.length ? (domItem.e.innerHTML = '') : (
+            newNode.c != containerNode.c && (containerNode.e.textContent = newNode.c),
+            !!(containerNode.k.length ^ newNode.k.length) ? diffDom(newNode.k, containerNode.k, containerNode.e) : containerNode.k.length ? (containerNode.e.innerHTML = '') : (
                 temp = doc.createDocumentFragment(),
-                diffDom(newItem.k, domItem.k, temp),
-                element.appendChild(temp)
+                diffDom(newNode.k, containerNode.k, temp),
+                containerElement.appendChild(temp)
             )
         )
     );
 },
 
-render = (component, element) => {
-    component.c.forEach(child => child.r = 1);
+
+render = (component, containerElement, element) => {
     element = domParser.parseFromString(component.html(), 'text/html').body.firstChild;
-    component.l && diffDom(mapDom(element), mapDom(component.l), component.l.parentNode);
+    component.c.forEach(child => child.r = 1);
+    if (!containerElement) {
+        containerElement = doc.createDocumentFragment();
+    }
+    deusInstance.a(component, element, containerElement);
     component.l = element;
 	component.r = 0;
     !component.post || component.post();
-	component.c = component.c.filter(child => child.r && (!child.unload || child.unload() || 1));
+    component.c = component.c.filter(child => child.r && (!child.unload || child.unload() || 1));
 },
 
 deepEqual = (a, b, temp) => (
