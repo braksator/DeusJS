@@ -122,7 +122,6 @@ addAttributes = (element, attributes, styleMap) => {
 },
 
 createElement = (node, element) => {
-    
     if (node.t == 'c-')
         return node.d.c.find(cmp => cmp.i == node.a.find(i => i.n == 'i').v).l;
 
