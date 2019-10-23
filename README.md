@@ -257,7 +257,8 @@ created anywhere with `MyApp.once()`.
 > `MyApp.once(eventName[, callback])`
 
 The callback will receive a single argument which is the data sent by the 
-emitter.
+emitter.  And yes, you need to supply the exact same callback to the `.off()`
+function as you did in the `on()` function so it can identify which listener to remove.
 
 ### Triggering an event or sending data
 
