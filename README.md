@@ -67,7 +67,7 @@ back-end doesn't load this for you in some other way).  Note also that we've
 used a global stylesheet as this lets us set up our common styles, which may be 
 a prefered way to approach styling for many projects.
 
-See the "HellowWorld example" below for an idea of how to write your `App.js`.
+See the "HelloWorld example" below for an idea of how to write your `App.js`.
 
 
 ## Creating a component
