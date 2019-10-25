@@ -74,8 +74,7 @@ See the "HelloWorld example" below for an idea of how to write your `myApp.js`.
 
 ### HelloWorld example
 
-Create a directory named `scr` and then create a file inside named `HelloWorld.js`.  It is
-possible to reconfigure the default directory path (see "Config").
+Create a directory named `scr` and then create a file inside named `HelloWorld.js`.
 
 ```javascript
 const MyApp = require('deusjs');
@@ -120,7 +119,7 @@ it is essentially the screen container, it has no parent.  It will automatically
 the `body` of your document unless the `container` argument is supplied in 
 `MyApp.go()` which would be a HTMLElement selected from the DOM:
 
-> `MyApp.go(screenName[, props, container])`
+> `MyApp.go(component[, props, directory, container])`
 
 You don't need to import or require the component, it will be autoloaded.
 
@@ -176,7 +175,7 @@ const SampleText = require('SampleText');
     }
 ```
 
-> `this.use(screenName[, props])`
+> `this.use(component[, props, directory])`
 
 To create the SampleText component:
 Create a directory named `cmp` where your `scr` directory is located.  This
@@ -239,7 +238,7 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `MyApp.go(screenName[, props, container])`
+> `MyApp.go(component[, props, directory, container])`
 
 > `MyApp.back([numberOfSteps, ..?])`
 
@@ -300,19 +299,6 @@ Setting global states doesn't trigger any rerender unless you also call
 > `MyApp.set({key1: val1[, key2: val2, ...]})`
 
 > `var value = MyApp.state.key1`
-
-
-## Config 
-
-### Configure component autoloading
-
-You can change the path of where components are kept by changing the value of `MyApp.sp` for navigation screens and `MyApp.cp` for other components.  
-
-Store all components in the `cmp` directory: 
-
-`MyApp.sp = MyApp.cp;`.
-
-The default value for `MyApp.sp` is `'./scr/'` and for `MyApp.cp` it is `'./cmp/'` so those directories will be expected at the root level of your project.
 
 ### Configure DOM attachment
 
