@@ -10,52 +10,38 @@ class DeusJS {
             state: {}, 
             h: [], 
             r: {}, 
-            a: (component, element, containerElement) => {
-                diffDom(
-                    component,
-                    mapDom(element, component),
-                    mapDom(containerElement), 
-                    containerElement
-                );
-            },
-            l: (cmp, props, dir, parent, component) => (
-                typeof cmp != 'string' ? (component = new (cmp)(), cmp = component.constructor.name) : 
-                    component = new (deusInstance.r[cmp] || require(dir + cmp))(),
-                ObjAssign(component, {props: props, p: parent, n: cmp, i: Math.random() + '' + Date.now()}),
-                !component.load || component.load(),
-                component
-            ),
-
             Cmp: class {
                 constructor(t = this) {
                     t.state = {};
                     t.c = [];
+                    t.use = (cmp, props, loadPath, component, t = this) => (
+                        (component = t.c.find(cmp => cmp == cmp.n && deepEqual(props, cmp.p))) ? 
+                            component = component.c : t.c.push(component = loadComponent(cmp, props, loadPath || './cmp/', t)),
+                        `<c- i=${component.i}>`
+                    );
                 }
-                
+
                 set(state, t = this) {
                     ObjAssign(t.state, state);
                     render(t, t.e.parentNode);
                 }
-                
-                use(cmp, props, dir, component, t = this) {
-                    (component = t.c.find(cmp => cmp == cmp.n && deepEqual(props, cmp.p))) ? 
-                        component = component.c : t.c.push(component = deusInstance.l(cmp, props, dir || './cmp/', t));
-                    return `<c- i=${component.i}>`;
-                }
+
             }
         });
     }
     
-    go(cmp, props, dir, containerElement = doc.body, component) {
-        component = deusInstance.l(cmp, props, dir || './scr/');
+    go(cmp, props, method, loadPath, containerElement = doc.body, component) {
+        component = loadComponent(cmp, props, loadPath || './scr/');
         history.pushState(props, component.title, component.n);
-		deusInstance.h.push(component);        
-		render(component, containerElement);
+        deusInstance.h.push(component);    
+        render(component, containerElement, method);
     }
 
-    back(step = -1) {
-        deusInstance.h.pop();
-        history.go(step);
+    back(step = -1, step2 = step) {
+        while (step++) 
+            deusInstance.h.pop();
+
+        history.go(step2);
     }
     
     on(eventName, callback) {
@@ -119,19 +105,22 @@ createElement = (node, parentElement, element, temp) => (
 
         addAttributes(element, node.a),
 
-        node.k.length && node.k.forEach(childNode => (temp = createElement(childNode, element)) && element.appendChild(temp))
-            || node.t != 'text' && (element.textContent = node.c),
+        node.k.length ? node.k.forEach((childNode) => (temp = createElement(childNode, element)) && element.append(temp)) : 
+            node.t != 'text' && (element.textContent = node.c),
 
         element
     )
 ),
 
-diffDom = (component, newMap, containerMap, containerElement, temp) => {
+diffDom = (component, newMap, containerMap, containerElement, method, temp) => {
     for (temp = containerMap.length - 1; temp >= newMap.length; temp--)
         containerElement.removeChild(containerMap[temp].e);
 
     newMap.forEach((newNode, index, containerNode) => {
-        !(containerNode = containerMap[index]) ? (temp = createElement(newNode, containerElement)) && containerElement.appendChild(temp) : 
+        !(containerNode = containerMap[index]) || method ? (temp = createElement(newNode, containerElement)) && containerElement.append(temp) && 
+            method &&
+            containerNode.e.setAttribute('class', element.getAttribute('class') + ' rm') && 
+            setTimeout(x => containerElement.removeChild(containerNode.e), method) : 
             newNode.t != containerNode.t ? (temp = createElement(newNode, containerElement)) && containerElement.replaceChild(temp, containerNode.e) : (
                 addAttributes(containerNode.e, newNode.a.filter(domAttribute => (
                     temp = containerNode.a.find(newAttribute => (domAttribute.n == newAttribute.n)),
@@ -156,10 +145,14 @@ diffDom = (component, newMap, containerMap, containerElement, temp) => {
     });
 },
 
-render = (component, containerElement, element) => {
+render = (component, containerElement, method, element) => {
     element = domParser.parseFromString(component.html(), 'text/html').body;
     component.c.forEach(child => child.r = 1);
-    deusInstance.a(component, element, containerElement);
+
+    method = method || component.m;
+    typeof method == 'function' ? method(element, containerElement, component) : 
+        diffDom(component, mapDom(element, component), mapDom(containerElement), containerElement, method);
+
     ObjAssign(component, {
         e: element,
         r: 0,
@@ -173,6 +166,14 @@ deepEqual = (a, b, temp) => (
         || a && b && typeof a == "object" && a.constructor == b.constructor
         && (temp = ObjKeys(b)) && temp.length == ObjKeys(a).length
         && !temp.find(v => !deepEqual(a[v], b[v]))
+),
+
+loadComponent = (cmp, props, dir, parent, component) => (
+    typeof cmp != 'string' ? (component = new (cmp)(), cmp = component.constructor.name) : 
+        component = new (deusInstance.r[cmp] || require(dir + cmp))(),
+    ObjAssign(component, {props: props, p: parent, n: cmp, i: Math.random() + '' + Date.now()}),
+    !component.load || component.load(),
+    component
 ),
 
 domParser = new DOMParser(), 

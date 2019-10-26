@@ -8,7 +8,8 @@ DeusJS
 **A very lightweight front-end framework inspired by React but easier to learn
 and use.**
 
-> Warning: This package is new and under development.
+> Warning: This package is new and under development.  Additionally
+> the current documentation will be unsuitable for most use cases.
 
 If you know HTML and JavaScript, you can learn DeusJS very quickly.
 
@@ -93,11 +94,8 @@ code inside the HTML using `${expression}` placeholders.  If you're unfamiliar
 with this type of JavaScript syntax check out 
 [Template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
-Tip: There are Visual Studio Code extensions that will syntax highlight the HTML here, 
-you can find them by searching for "es6-string" in the extensions marketplace.
-
-> Warning! only the first HTML element (and its children) will be used.
-> A convention you might adopt is to wrap groups of HTML elements in a `<div>`.
+> Tip: There are Visual Studio Code extensions that will syntax highlight the HTML here, 
+> you can find them by searching for "es6-string" in the extensions marketplace.
 
 Note how a value was set to the `title` property, this is not neccessary for
 most components, but this component will be treated as a navigation screen,
@@ -119,7 +117,7 @@ it is essentially the screen container, it has no parent.  It will automatically
 the `body` of your document unless the `container` argument is supplied in 
 `MyApp.go()` which would be a HTMLElement selected from the DOM:
 
-> `MyApp.go(component[, props, directory, container])`
+> `MyApp.go(component[, props, method, directory, container])`
 
 You don't need to import or require the component, it will be autoloaded.
 
@@ -238,7 +236,7 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `MyApp.go(component[, props, directory, container])`
+> `MyApp.go(component[, props, method, directory, container])`
 
 > `MyApp.back([numberOfSteps, ..?])`
 
@@ -264,6 +262,51 @@ These can be dynamically added and deleted at runtime as required.
 > This registry can be used to cache any component class for future use, and 
 > bypass the autoloader.
 
+## Transitions
+
+By default components are updated using a DOM diff that makes minimal updates 
+to the DOM.  This may not be always desirable as it doesn't allow for 
+transition animations.  A component's default attachment method can be set 
+like so:
+
+```javascript
+module.exports = class Example extends MyApp.Cmp {
+    m: 2000,
+    html() {
+        return "Lorem Ipsum Dolor Sit Amet";
+    }
+}
+```
+
+In this case the component class property `m` is set to 2000.  The "new" element
+will be appended to the container as a sibling to the "old" element.  The "old"
+element will receive a new class name `rm`.  After 2000ms the "old" element will 
+be removed from the document. It is advisable to use CSS to transition out the 
+"old" element based on the `.rm` selector.  Your "new" element could start
+invisible or off-screen, and transition into view.  Ensure your CSS transitions
+are done within the time supplied.
+
+To restore default behaviour:
+```javascript
+delete this.m;
+```
+
+You can supply a custom DOM attachment function like so:
+
+```javascript
+module.exports = class Example extends MyApp.Cmp {
+    m: (element, containerElement) => {
+        // Your DOM manipulation code here.
+    },
+    html() {
+        return "Lorem Ipsum Dolor Sit Amet";
+    }
+}
+```
+
+You can override this when navigating by setting the `method` arg of `myApp.go()`
+using the delay integer, or the callback.  Note: the callback also receives a
+3rd argument; the component itself.
 
 ## Events / Triggers / Messaging 
 
