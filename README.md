@@ -152,7 +152,6 @@ a component called "SampleText" is inserted.
 
 > `this.use(component[, props])`
 
-```
 
 ### Updating components
 
