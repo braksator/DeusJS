@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var terser = require('gulp-terser');
 var rename = require("gulp-rename");
 var eslint = require('gulp-eslint');
+var footer = require('gulp-footer');
 
 gulp.task('lint', () => {
   return gulp.src(['./src.js'])
@@ -25,12 +26,27 @@ gulp.task('lint', () => {
 
 gulp.task('deus', function () {
   return gulp.src('./src.js')
+  
+    .pipe(footer('export default deusInstance;'))
     .pipe(terser({
         ecma: 7,
         mangle: {
           toplevel: true,
         },
       }))
-    .pipe(rename("deus.js"))
-    .pipe(gulp.dest('./'));
+    .pipe(rename("deusjs.mjs"))
+    .pipe(gulp.dest('./')) 
+
+    &&
+
+    gulp.src('./src.js')
+      .pipe(footer('module.exports = deusInstance;'))
+      .pipe(terser({
+          ecma: 7,
+          mangle: {
+            toplevel: true,
+          },
+        }))
+      .pipe(rename("deusjs.cjs"))
+      .pipe(gulp.dest('./'));
 });

@@ -14,9 +14,9 @@ class DeusJS {
                 constructor(t = this) {
                     t.state = {};
                     t.c = [];
-                    t.use = (cmp, props, loadPath, component, t = this) => (
+                    t.use = (cmp, props, component, t = this) => (
                         (component = t.c.find(cmp => cmp == cmp.n && deepEqual(props, cmp.p))) ? 
-                            component = component.c : t.c.push(component = loadComponent(cmp, props, loadPath || './cmp/', t)),
+                            component = component.c : t.c.push(component = loadComponent(cmp, props, t)),
                         `<c- i=${component.i}>`
                     );
                 }
@@ -30,8 +30,8 @@ class DeusJS {
         });
     }
     
-    go(cmp, props, method, loadPath, containerElement = doc.body, component) {
-        component = loadComponent(cmp, props, loadPath || './scr/');
+    go(cmp, props, method, containerElement = doc.body, component) {
+        component = loadComponent(cmp, props);
         history.pushState(props, component.title, component.n);
         deusInstance.h.push(component);    
         render(component, containerElement, method);
@@ -162,15 +162,15 @@ render = (component, containerElement, method, element) => {
 },
 
 deepEqual = (a, b, temp) => (
-	a === b || typeof a == "function" && b && a.toString() == b.toString()
+    a === b || typeof a == "function" && b && a.toString() == b.toString()
         || a && b && typeof a == "object" && a.constructor == b.constructor
         && (temp = ObjKeys(b)) && temp.length == ObjKeys(a).length
         && !temp.find(v => !deepEqual(a[v], b[v]))
 ),
 
-loadComponent = (cmp, props, dir, parent, component) => (
+loadComponent = (cmp, props, parent, component) => (
     typeof cmp != 'string' ? (component = new (cmp)(), cmp = component.constructor.name) : 
-        component = new (deusInstance.r[cmp] || require(dir + cmp))(),
+        component = new (deusInstance.r[cmp])(),
     ObjAssign(component, {props: props, p: parent, n: cmp, i: Math.random() + '' + Date.now()}),
     !component.load || component.load(),
     component
@@ -182,4 +182,4 @@ ObjAssign = Object.assign,
 ObjKeys = Object.keys,
 deusInstance = new DeusJS();
 
-module.exports = deusInstance;
+export default deusInstance;

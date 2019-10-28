@@ -2,10 +2,7 @@
   "name": "deusjs",
   "version": "0.0.0",
   "description": "A very lightweight front-end framework inspired by React but easier to learn",
-  "main": "deus.js",
-  "scripts": {
-    "dev": "node src.js"
-  },
+  "main": "deusjs.mjs",
   "repository": {
     "type": "git",
     "url": "https://github.com/braksator/DeusJS.git"
@@ -24,8 +21,6 @@
     "global",
     "state",
     "state",
-    "autoload",
-    "autoloading",
     "thin",
     "lightweight",
     "tiny",
@@ -40,7 +35,11 @@
     "decomment": "^0.9.2",
     "gulp": "^4.0.2",
     "gulp-eslint": "^6.0.0",
+    "gulp-footer": "^2.0.2",
     "gulp-rename": "^1.4.0",
     "gulp-terser": "^1.2.0"
+  },
+  "dependencies": {
+    "browserify": "^16.5.0"
   }
 }

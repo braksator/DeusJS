@@ -3,123 +3,114 @@
 DeusJS
 ===========
 
-> \[**dey** -uh s **jey**-uh s\]
+> \[**dey**-uh s **jey**-uh s\]
 
 **A very lightweight front-end framework inspired by React but easier to learn
 and use.**
 
-> Warning: This package is new and under development.  Additionally
-> the current documentation will be unsuitable for most use cases.
+> Warning: This package is new and under development.
 
 If you know HTML and JavaScript, you can learn DeusJS very quickly.
 
-- Create components with props and state using actual HTML to template the output
-- Navigation between 'screen' components
-- Autoloading of all components, no need to import/require components or 
-  configure nav data in the app. (However, you absolutely can!)
-- Easy events/triggering/messaging between components.
-- Easy access to parent and children components.
-- Access to a global state.
-- Efficient DOM rendering on state change.
-
-
 ## Usage
 
-Get your hands on [deus.js](https://raw.githubusercontent.com/braksator/DeusJS/master/deus.js) and `require()` the file.
-
-Everywhere you use DeusJS you'll have to require DeusJS in your project:
-
-```javascript
-const DeusJS = require('./path/to/deus.js');
-
-```
-You might name the constant something other than `DeusJS`, perhaps the name of your app.
+Get your hands on [deusjs.mjs](https://raw.githubusercontent.com/braksator/DeusJS/master/deusjs.mjs)
+and save it in your project.
 
 ### Usage with NPM
 
-DeusJS [is available on NPM](https://www.npmjs.com/package/deusjs) if you prefer: `npm install deusjs -S` or with Yarn (recommended): `yarn add deusjs`
+DeusJS [is available on NPM](https://www.npmjs.com/package/deusjs): `npm install deusjs -S` 
+
+or with Yarn (recommended): `yarn add deusjs`
 
 
-## Setting up a project
+### Including DeusJS in your project
 
-The basic idea is you create an index.html or otherwise output a starting HTML 
-page like so:
-
-```
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Your project name</title>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="global.css">
-    </head>
-    <body>
-        <div id="my-splash-page">
-            This is the document we'll see until we call Nav.go() in app.js
-            so this can be used as a splash page until things are ready.
-        </div>
-        <script src="myApp.js"></script>
-    </body>
-</html>
+```javascript
+import MyApp from './deusjs.mjs';
 ```
 
-Note the script tag which will pull in our front-end application (assuming your
-back-end doesn't load this for you in some other way).  Note also that we've 
-used a global stylesheet as this lets us set up our common styles, which may be 
-a prefered way to approach styling for many projects.
+### With CommonJS
 
-See the "HelloWorld example" below for an idea of how to write your `myApp.js`.
+If you're using an environment where CommonJS modules are supported in lieu of
+ES modules, you'll need [deusjs.cjs](https://raw.githubusercontent.com/braksator/DeusJS/master/deusjs.cjs) instead.
 
+```javascript
+const MyApp = require('./deusjs.cjs');
+```
 
 ## Creating a component
 
 ### HelloWorld example
 
-Create a directory named `scr` and then create a file inside named `HelloWorld.js`.
+
+`index.html`:
+
+```html
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<h1>Loading...</h1>
+		<script type="module" src="./helloworld.js"></script>
+	</body>
+</html>
+```
+
+`helloworld.js`:
 
 ```javascript
-const MyApp = require('deusjs');
+import helloWorldApp from "./deujs.mjs";
 
-module.exports = class HelloWorld extends MyApp.Cmp {
-    title = 'My Hello World component';
-    html() {
-        return `
-            <p>hello, world!</p>
-        `;
-    }
+class HelloWorldScreen extends helloWorldApp.Cmp {
+	title = 'Hello World App';
+
+	state = {
+		helloList: [],
+	};
+
+	addHello() {
+		var helloList = this.state.helloList;
+		helloList.push('hello');
+		this.set({'helloList': helloList});
+	}
+
+	html() {
+		return `
+			<h1>hello, world!</h1>
+			<p>This is the HelloWorldApp.</p>
+			<button id="hello-button">say hello</button>
+			<div>${this.use(ListMaker, {items: this.state.helloList})}</div>
+		`;
+	}
+
+	post() {
+		document.getElementById("hello-button").addEventListener('click', this.addHello);
+	}
 }
-```
-Note the use of backticks around the HTML, this will allow executing JavaScript 
-code inside the HTML using `${expression}` placeholders.  If you're unfamiliar
-with this type of JavaScript syntax check out 
-[Template literals](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals).
 
-> Tip: There are Visual Studio Code extensions that will syntax highlight the HTML here, 
-> you can find them by searching for "es6-string" in the extensions marketplace.
+class ListMaker extends helloWorldApp.Cmp {
+	html() {
+		var items = this.props.items;
+		return `
+			<ul>
+				${items.map(item => `<li>${item}</li>`).join('')}
+			</ul>
+			<style>
+				ul { 
+					color: green; 
+				}
+			</style>
+		`;
+	}
+}
 
-Note how a value was set to the `title` property, this is not neccessary for
-most components, but this component will be treated as a navigation screen,
-and the `title` property is recognised by the navigation system.
-
-Your myApp.js:
-
-```javascript
-document.addEventListener("DOMContentLoaded", function(){
-    const MyApp = require('deusjs');
-
-    // Navigate to HelloWorld screen.
-    MyApp.go('HelloWorld');
-});
+helloWorldApp.go(HelloWorldScreen);
 ```
 
-Since we're navigating to this component it will be the root component of the app,
-it is essentially the screen container, it has no parent.  It will automatically replace
-the `body` of your document unless the `container` argument is supplied in 
-`MyApp.go()` which would be a HTMLElement selected from the DOM:
-
-> `MyApp.go(component[, props, method, directory, container])`
-
-You don't need to import or require the component, it will be autoloaded.
 
 ### Insert props into the HTML.
 
@@ -151,21 +142,7 @@ This JavaScript placeholder has an expression that will print out the number `4`
 This is how the sausage is made.  You'll be doing this a lot.  In this example
 a component called "SampleText" is inserted.
 
-```javascript    
-    html() {
-        return `
-            <p>${this.use('SampleText')}</p>
-        `;
-    }
-```
-
-You don't need to import or require the SampleText component, it will be autoloaded.
-
-You don't have to use the autoloading feature:
-
 ```javascript
-const SampleText = require('SampleText');
-
     html() {
         return `
             <p>${this.use(SampleText)}</p>
@@ -173,19 +150,7 @@ const SampleText = require('SampleText');
     }
 ```
 
-> `this.use(component[, props, directory])`
-
-To create the SampleText component:
-Create a directory named `cmp` where your `scr` directory is located.  This
-directory will store components that will never be used as root level screens.
-Now create a file called `SampleText.js` with the following code:
-
-```javascript 
-module.exports = class SampleText extends MyApp.Cmp {
-    html() {
-        return "Lorem Ipsum Dolor Sit Amet";
-    }
-}
+> `this.use(component[, props])`
 
 ```
 
@@ -217,8 +182,9 @@ Some other things you can access:
 - `this.state` The state object resulting from your calls to `this.set()`. 
 - `this.c` Array of children, each in the format of an object with keys `n` (name), `p` (props), and `c` (component).
 - `this.p` Parent component (will be undefined for the root component).
-- `this.e` The HTMLElement parsed from the component's HTML.
+- `this.e` The HTMLElement node parsed from the component's HTML.
 - `this.r` An internally used rendering flag, modifying this may lead to undefined behaviour.
+- `this.i` An internally used component ID.
 
 > You can manipulate parent and child components, e.g. 
 > `this.p.set({someKey: someValue})`, this circumvents the classic 
@@ -236,7 +202,7 @@ attribute), and any manipulation via JavaScript that is needed.
 
 Basic navigation is demonstrated above with the HelloWorld example.
 
-> `MyApp.go(component[, props, method, directory, container])`
+> `MyApp.go(component[, props, method, container])`
 
 > `MyApp.back([numberOfSteps, ..?])`
 
@@ -249,18 +215,14 @@ this if you want to:
 
 ```javascript
 // Register it.
-myApp.r['some/uri/here'] = ComponentClass;
+myApp.r['some/uri/here'] = MyComponentClass;
 
 // Use it.
 myApp.go('some/uri/here');
 
-// Free up memory if no longer needed.
-delete myApp['some/uri/here'];
 
 ```
-These can be dynamically added and deleted at runtime as required.  
-> This registry can be used to cache any component class for future use, and 
-> bypass the autoloader.
+These can be dynamically added and deleted at runtime as required.
 
 ## Transitions
 
@@ -342,10 +304,3 @@ Setting global states doesn't trigger any rerender unless you also call
 > `MyApp.set({key1: val1[, key2: val2, ...]})`
 
 > `var value = MyApp.state.key1`
-
-### Configure DOM attachment
-
-The default DOM diffing and rendering is done by `MyApp.a()`, you can override
-this function by redefining it.  For example some components may need to render
-simply with a straight swap, or render into a cloned element to facilitate a
-transition animation. 
