@@ -181,5 +181,3 @@ doc = document,
 ObjAssign = Object.assign,
 ObjKeys = Object.keys,
 deusInstance = new DeusJS();
-
-export default deusInstance;

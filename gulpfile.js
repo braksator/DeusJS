@@ -26,7 +26,6 @@ gulp.task('lint', () => {
 
 gulp.task('deus', function () {
   return gulp.src('./src.js')
-  
     .pipe(footer('export default deusInstance;'))
     .pipe(terser({
         ecma: 7,
