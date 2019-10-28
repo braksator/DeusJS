@@ -1,3 +1,4 @@
+
 /**
  * DeusJS
  */
@@ -86,7 +87,8 @@ addAttributes = (element, attributes, styleMap) => {
             styleMap = attribute.v.split(';').reduce((arr, style) => (
                 ~style.trim().indexOf(':') && arr.push(style.split(':')),
                 arr
-            ), []).forEach(style => element.style[style[0]] = style[1]),
+            ), []),
+            styleMap.forEach(style => element.style[style[0]] = style[1]),
 
             [...element.style].filter(style => !styleMap.find(
                 newStyle => newStyle[0] == style && newStyle[1] == element.style[style]
@@ -128,9 +130,9 @@ diffDom = (component, newMap, containerMap, containerElement, method, temp) => {
                 ))),
         
                 containerNode.a.filter(attribute => (!newNode.a.find(newAttribute => (attribute.n == newAttribute.n)))).forEach(a => {
-                    a.n == 'class' && (containerNode.e.className = '')
-                        || a.n == 'style' && [...containerNode.e.style].forEach(s => containerNode.e.style[s] = '')
-                        || containerNode.e.removeAttribute(a.n);
+                    a.n == 'class' ? (containerNode.e.className = '') :
+                        a.n == 'style' ? [...containerNode.e.style].forEach(s => containerNode.e.style[s] = '') :
+                        containerNode.e.removeAttribute(a.n);
                 }),
         
                 newNode.c != containerNode.c && (containerNode.e.textContent = newNode.c),
