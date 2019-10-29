@@ -26,7 +26,10 @@ class DeusJS {
                     ObjAssign(t.state, state);
                     render(t, t.e);
                 }
-
+                
+                $(query, event, func) {
+                    this.e.querySelectorAll(query).forEach(element => element.addEventListener(event, func));
+                }
             }
         });
     }
@@ -94,7 +97,8 @@ addAttributes = (element, attributes, styleMap) => {
                 newStyle => newStyle[0] == style && newStyle[1] == element.style[style]
             )).forEach(style => element.style[style] = '')
 
-        ) : element.setAttribute(attribute.n, attribute.v || !0)
+        ) : attribute.n.substring(0, 2) == "on" ? element.addEventListener(attribute.n.substring(2).toLowerCase(), attribute.v) : 
+        element.setAttribute(attribute.n, attribute.v || !0)
     );
 },
 
@@ -145,7 +149,7 @@ diffDom = (component, newMap, containerMap, containerElement, method, temp) => {
                     ) : diffDom(component, newNode.k, containerNode.k, containerNode.e)
                 ) : containerNode.k.length && (containerNode.e.innerHTML = '')
 
-            )
+            );
     });
 },
 

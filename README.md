@@ -164,6 +164,29 @@ that has caused the return value of html() to change.
 
 > `this.set({key1: val1[, key2: val2, ...]})`
 
+### Adding event handlers
+
+Working with event attributes like `onClick` has limited use with HTML strings 
+and template literals, therefore adding event listeners in the `post()` 
+function is the way to go.  There are other benefits to using this style of 
+event handling, and you may find it preferable anyway.
+
+The long form, which you can modify easily, is:
+
+```javascript
+    post() {
+        this.e.querySelectorAll('div#query button.selector')[0].addEventListener('click', this.makeClick);
+    }
+```
+
+You'll probably need this quite a bit too, so there's some shorthand:
+
+```javascript
+    post() {
+        this.$('div#query button.selector', 'click', this.makeClick);
+    }
+```
+
 ### Methods to implement
 
 Here are all the member functions you can implement.
