@@ -88,7 +88,7 @@ class HelloWorldScreen extends helloWorldApp.Cmp {
 	}
 
 	post() {
-		document.getElementById("hello-button").addEventListener('click', this.addHello);
+		this.e.getElementById("hello-button").addEventListener('click', this.addHello);
 	}
 }
 

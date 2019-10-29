@@ -134,16 +134,18 @@ diffDom = (component, newMap, containerMap, containerElement, method, temp) => {
                         a.n == 'style' ? [...containerNode.e.style].forEach(s => containerNode.e.style[s] = '') :
                         containerNode.e.removeAttribute(a.n);
                 }),
-        
+
                 newNode.c != containerNode.c && (containerNode.e.textContent = newNode.c),
 
-                !!(containerNode.k.length ^ newNode.k.length) ? diffDom(component, newNode.k, containerNode.k, containerNode.e) : 
-                    containerNode.k.length ? (containerNode.e.innerHTML = '') : (
-                        temp = doc.createDocumentFragment(),
+                newNode.k.length ? (
+                    !containerNode.k.length ? (
+                        temp = document.createDocumentFragment(),
                         diffDom(component, newNode.k, containerNode.k, temp),
                         containerElement.appendChild(temp)
-                )
-            );
+                    ) : diffDom(component, newNode.k, containerNode.k, containerNode.e)
+                ) : containerNode.k.length && (containerNode.e.innerHTML = '')
+
+            )
     });
 },
 
