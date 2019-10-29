@@ -97,8 +97,7 @@ addAttributes = (element, attributes, styleMap) => {
                 newStyle => newStyle[0] == style && newStyle[1] == element.style[style]
             )).forEach(style => element.style[style] = '')
 
-        ) : attribute.n.substring(0, 2) == "on" ? element.addEventListener(attribute.n.substring(2).toLowerCase(), attribute.v) : 
-        element.setAttribute(attribute.n, attribute.v || !0)
+        ) : element.setAttribute(attribute.n, attribute.v || !0)
     );
 },
 
