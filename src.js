@@ -24,7 +24,7 @@ class DeusJS {
 
                 set(state, t = this) {
                     ObjAssign(t.state, state);
-                    render(t, t.e.parentNode);
+                    render(t, t.e);
                 }
 
             }
@@ -156,7 +156,7 @@ render = (component, containerElement, method, element) => {
         diffDom(component, mapDom(element, component), mapDom(containerElement), containerElement, method);
 
     ObjAssign(component, {
-        e: element,
+        e: containerElement,
         r: 0,
         c: component.c.filter(child => child.r && (!child.unload || child.unload() || 1))
     });
