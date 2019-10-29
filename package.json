@@ -32,7 +32,6 @@
   },
   "homepage": "https://github.com/braksator/DeusJS#readme",
   "devDependencies": {
-    "decomment": "^0.9.2",
     "gulp": "^4.0.2",
     "gulp-eslint": "^6.0.0",
     "gulp-footer": "^2.0.2",
