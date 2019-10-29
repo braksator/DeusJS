@@ -181,14 +181,13 @@ Some other things you can access:
 - `this.state` The state object resulting from your calls to `this.set()`. 
 - `this.c` Array of children, each in the format of an object with keys `n` (name), `p` (props), and `c` (component).
 - `this.p` Parent component (will be undefined for the root component).
-- `this.e` The HTMLElement node parsed from the component's HTML.
+- `this.e` The container element where this component's output is being placed.
 - `this.r` An internally used rendering flag, modifying this may lead to undefined behaviour.
 - `this.i` An internally used component ID.
 
 > You can manipulate parent and child components, e.g. 
 > `this.p.set({someKey: someValue})`, this circumvents the classic 
-> *reactive* workflow.  But it's your app, you decide how you want
-> to do things, DeusJS lets you be in charge.
+> *reactive* workflow.
 
 ### Styles
 
