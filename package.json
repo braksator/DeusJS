@@ -1,6 +1,6 @@
 {
   "name": "deusjs",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "description": "A very lightweight front-end framework inspired by React but easier to learn",
   "main": "deusjs.mjs",
   "repository": {
